@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 70% 16%, #0e356f22, transparent 30%),
+    radial-gradient(circle at 15% 55%, #123c7020, transparent 28%);
+  background-attachment: fixed;
+}
+
+.container-app {
+  width: min(1380px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.btn-gold {
+  @apply bg-gradient-to-br from-gold to-gold-light text-[#0a0d12] font-extrabold rounded-xl px-6 py-3 border border-[#f4c65b] shadow-[0_8px_30px_#e9ac3c22] hover:brightness-105 transition;
+}
+
+.btn-outline {
+  @apply bg-navy border border-line text-white font-extrabold rounded-xl px-6 py-3 hover:border-[#49637e] transition;
+}
+
+.card {
+  @apply bg-card border border-line rounded-xl2;
+}
