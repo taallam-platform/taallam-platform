@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { loginSchema } from '@/lib/validation';
 import { isIpBlocked, recordLoginAttempt, clearFailedAttempts, getClientIp } from '@/lib/rate-limit';
 
@@ -19,29 +19,57 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'البيانات غير صحيحة' }, { status: 400 });
   }
 
-  const { email, password } = parsed.data;
+  const { username, password } = parsed.data;
+  const admin = createAdminClient();
+
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('id')
+    .eq('username', username.toLowerCase())
+    .maybeSingle();
+
+  if (!profile) {
+    await recordLoginAttempt(ip, username, false);
+    return NextResponse.json({ error: 'اسم المستخدم أو كلمة السر غير صحيحة' }, { status: 401 });
+  }
+
+  const { data: userData, error: userError } = await admin.auth.admin.getUserById(profile.id);
+
+  if (userError || !userData?.user?.email) {
+    await recordLoginAttempt(ip, username, false);
+    return NextResponse.json({ error: 'اسم المستخدم أو كلمة السر غير صحيحة' }, { status: 401 });
+  }
+
   const supabase = createClient();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: userData.user.email,
+    password,
+  });
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-  await recordLoginAttempt(ip, email, !error);
+  await recordLoginAttempt(ip, username, !error);
 
   if (error) {
-    return NextResponse.json({ error: 'البريد الإلكتروني أو كلمة السر غير صحيحة' }, { status: 401 });
+    if (error.message.includes('Email not confirmed')) {
+      return NextResponse.json(
+        { error: 'لازم تأكد بريدك الإلكتروني الأول، شوف الإيميل اللي وصلك' },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json({ error: 'اسم المستخدم أو كلمة السر غير صحيحة' }, { status: 401 });
   }
 
   await clearFailedAttempts(ip);
 
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from('profiles')
     .select('role, is_banned')
     .eq('id', data.user.id)
     .single();
 
-  if (profile?.is_banned) {
+  if (profileData?.is_banned) {
     await supabase.auth.signOut();
     return NextResponse.json({ error: 'الحساب ده محظور' }, { status: 403 });
   }
 
-  return NextResponse.json({ user: data.user, role: profile?.role ?? 'student' });
+  return NextResponse.json({ user: data.user, role: profileData?.role ?? 'student' });
 }
