@@ -23,6 +23,20 @@ async function getFeaturedCourses() {
   return data ?? [];
 }
 
+async function getStats() {
+  const supabase = createClient();
+  const [{ count: coursesCount }, { count: studentsCount }, { count: teachersCount }] = await Promise.all([
+    supabase.from('courses').select('*', { count: 'exact', head: true }).eq('is_published', true),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'teacher'),
+  ]);
+  return {
+    courses: coursesCount ?? 0,
+    students: studentsCount ?? 0,
+    teachers: teachersCount ?? 0,
+  };
+}
+
 async function getProfile() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +46,7 @@ async function getProfile() {
 }
 
 export default async function HomePage() {
-  const [courses, profile] = await Promise.all([getFeaturedCourses(), getProfile()]);
+  const [courses, profile, stats] = await Promise.all([getFeaturedCourses(), getProfile(), getStats()]);
 
   return (
     <>
@@ -55,7 +69,9 @@ export default async function HomePage() {
               والمدربين في مختلف المجالات، في تجربة تعلم احترافية وممتعة.
             </p>
             <div className="flex gap-3 flex-wrap justify-center lg:justify-start mt-7">
-              <a href="#courses" className="btn-gold">ابدأ التعلم الآن ←</a>
+              <a href={profile ? '/dashboard' : '#courses'} className="btn-gold">
+                {profile ? 'كورساتي ←' : 'ابدأ التعلم الآن ←'}
+              </a>
               <a href="/courses" className="btn-outline">استكشف الكورسات ▦</a>
             </div>
           </div>
@@ -73,8 +89,8 @@ export default async function HomePage() {
 
         {/* Stats */}
         <div className="container-app -mt-6 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 bg-gradient-to-l from-[#081525] to-[#0a1728] border border-[#1e334a] rounded-2xl p-5 shadow-2xl">
-            {[['+1,200', 'كورس'], ['+50,000', 'طالب'], ['+300', 'مدرّس'], ['4.9', 'تقييم المنصة'], ['+120', 'دولة']].map(
+          <div className="grid grid-cols-3 gap-3 bg-gradient-to-l from-[#081525] to-[#0a1728] border border-[#1e334a] rounded-2xl p-5 shadow-2xl">
+            {[[`+${stats.courses}`, 'كورس'], [`+${stats.students}`, 'طالب'], [`+${stats.teachers}`, 'مدرّس']].map(
               ([n, l]) => (
                 <div key={l} className="text-center border-l border-[#26394e] last:border-0 py-2">
                   <strong className="block text-2xl text-gold">{n}</strong>
@@ -95,10 +111,14 @@ export default async function HomePage() {
           </div>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {CATEGORIES.map(([icon, name]) => (
-              <div key={name} className="min-w-[145px] border border-[#1a2d43] bg-[#071322] rounded-2xl p-4 text-center font-extrabold text-[#bdc8d7] hover:border-[#8f6826] hover:text-gold transition cursor-pointer">
+              <a
+                key={name}
+                href={`/courses?category=${encodeURIComponent(name)}`}
+                className="min-w-[145px] border border-[#1a2d43] bg-[#071322] rounded-2xl p-4 text-center font-extrabold text-[#bdc8d7] hover:border-[#8f6826] hover:text-gold transition cursor-pointer block"
+              >
                 <span className="text-2xl block mb-1.5">{icon}</span>
                 {name}
-              </div>
+              </a>
             ))}
           </div>
         </section>
@@ -137,13 +157,15 @@ export default async function HomePage() {
         </section>
 
         {/* CTA */}
-        <section id="pricing" className="container-app my-8 mb-16 border border-[#6e5122] rounded-3xl bg-gradient-to-r from-[#0b192b] to-[#07101c] p-8 lg:p-11 flex flex-col lg:flex-row items-center justify-between gap-5 text-center lg:text-right">
-          <div>
-            <h2 className="text-xl font-bold mb-1.5">جاهز تبدأ رحلتك التعليمية؟</h2>
-            <p className="text-[#8998ad] text-sm">انضم إلى آلاف المتعلمين وابدأ تطوير مهاراتك اليوم.</p>
-          </div>
-          <a href="/register" className="btn-gold">ابدأ الآن ←</a>
-        </section>
+        {!profile && (
+          <section id="pricing" className="container-app my-8 mb-16 border border-[#6e5122] rounded-3xl bg-gradient-to-r from-[#0b192b] to-[#07101c] p-8 lg:p-11 flex flex-col lg:flex-row items-center justify-between gap-5 text-center lg:text-right">
+            <div>
+              <h2 className="text-xl font-bold mb-1.5">جاهز تبدأ رحلتك التعليمية؟</h2>
+              <p className="text-[#8998ad] text-sm">انضم إلى آلاف المتعلمين وابدأ تطوير مهاراتك اليوم.</p>
+            </div>
+            <a href="/register" className="btn-gold">ابدأ الآن ←</a>
+          </section>
+        )}
       </main>
 
       <footer id="contact" className="border-t border-[#15273a] py-8 text-[#718198] text-xs">

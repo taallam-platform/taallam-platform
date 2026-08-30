@@ -8,6 +8,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -45,7 +46,7 @@ export default function RegisterPage() {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, email, password }),
+      body: JSON.stringify({ fullName, username, email, password }),
     });
     const json = await res.json();
 
@@ -55,7 +56,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // رفع الأفاتار الاختياري بعد إنشاء الحساب (لو السيشن اتفعّلت فورًا)
     if (avatarFile) {
       const formData = new FormData();
       formData.append('avatar', avatarFile);
@@ -63,8 +63,6 @@ export default function RegisterPage() {
     }
 
     setLoading(false);
-
-    // لو ده إيميل الأدمن، بعد ما يأكد الكود هيتحول للوحة التحكم تلقائيًا (منطق ده في صفحة /verify)
     router.push(`/verify?email=${encodeURIComponent(email)}`);
   }
 
@@ -102,6 +100,21 @@ export default function RegisterPage() {
             className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
             placeholder="اسمك بالكامل"
           />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-sm font-bold text-[#d3d9e5]">اسم المستخدم</span>
+          <input
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
+            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="username"
+            dir="ltr"
+            pattern="[a-zA-Z0-9_]+"
+            title="حروف إنجليزي وأرقام و _ بس"
+          />
+          <span className="text-[11px] text-muted mt-1 block">هتستخدمه لتسجيل الدخول بعد كده</span>
         </label>
 
         <label className="block mb-4">

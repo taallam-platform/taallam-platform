@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,14 +17,27 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    const resolveRes = await fetch('/api/auth/resolve-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username }),
+    });
+    const resolveJson = await resolveRes.json();
+
+    if (!resolveRes.ok) {
+      setLoading(false);
+      setError(resolveJson.error ?? 'اسم المستخدم أو كلمة السر غير صحيحة');
+      return;
+    }
+
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+      email: resolveJson.email,
       password,
     });
 
     if (signInError || !data.user) {
       setLoading(false);
-      setError('البريد الإلكتروني أو كلمة السر غير صحيحة');
+      setError('اسم المستخدم أو كلمة السر غير صحيحة');
       return;
     }
 
@@ -64,13 +77,14 @@ export default function LoginPage() {
         )}
 
         <label className="block mb-4">
-          <span className="text-sm font-bold text-[#d3d9e5]">البريد الإلكتروني</span>
+          <span className="text-sm font-bold text-[#d3d9e5]">اسم المستخدم</span>
           <input
             required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="username"
+            dir="ltr"
           />
         </label>
 

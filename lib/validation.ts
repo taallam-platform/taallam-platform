@@ -9,14 +9,21 @@ export const passwordSchema = z
   .regex(/[a-z]/, 'لازم تحتوي على حرف صغير')
   .regex(/[0-9]/, 'لازم تحتوي على رقم');
 
+export const usernameSchema = z
+  .string()
+  .min(3, 'اسم المستخدم لازم يكون 3 أحرف على الأقل')
+  .max(30, 'اسم المستخدم طويل أوي')
+  .regex(/^[a-zA-Z0-9_]+$/, 'اسم المستخدم يسمح فيه بس بحروف إنجليزي وأرقام و _');
+
 export const registerSchema = z.object({
   fullName: z.string().min(2).max(80),
+  username: usernameSchema,
   email: z.string().email(),
   password: passwordSchema,
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
+  username: z.string().min(1),
   password: z.string().min(1),
 });
 
