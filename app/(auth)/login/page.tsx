@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,21 +17,33 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    const json = await res.json();
 
-    setLoading(false);
-    if (!res.ok) {
-      setError(json.error ?? 'حصل خطأ، حاول تاني');
+    if (signInError || !data.user) {
+      setLoading(false);
+      setError('البريد الإلكتروني أو كلمة السر غير صحيحة');
       return;
     }
 
-    // لو الإيميل ده إيميل الأدمن، حوّله على طول للوحة التحكم
-    if (json.role === 'admin') {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, is_banned')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profile?.is_banned) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError('الحساب ده محظور');
+      return;
+    }
+
+    setLoading(false);
+
+    if (profile?.role === 'admin') {
       router.push('/admin/dashboard');
     } else {
       router.push('/');
