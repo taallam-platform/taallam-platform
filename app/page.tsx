@@ -37,6 +37,12 @@ async function getStats() {
   };
 }
 
+async function getHeroVideo() {
+  const supabase = createClient();
+  const { data } = await supabase.from('site_settings').select('value').eq('key', 'hero_video_url').maybeSingle();
+  return data?.value ?? null;
+}
+
 async function getProfile() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -46,7 +52,7 @@ async function getProfile() {
 }
 
 export default async function HomePage() {
-  const [courses, profile, stats] = await Promise.all([getFeaturedCourses(), getProfile(), getStats()]);
+  const [courses, profile, stats, heroVideo] = await Promise.all([getFeaturedCourses(), getProfile(), getStats(), getHeroVideo()]);
 
   return (
     <>
@@ -78,11 +84,15 @@ export default async function HomePage() {
 
           <div className="h-[380px] lg:h-[520px] grid place-items-center relative">
             <div className="w-[90%] max-w-[650px] h-[280px] rounded-[22px] bg-gradient-to-br from-[#101d2e] to-navy border border-[#38516b] shadow-2xl p-4">
-              <div className="h-full rounded-xl bg-gradient-to-br from-[#07172b] to-[#0b2440] border border-[#233f5c] grid place-items-center">
-                <div className="w-14 h-14 rounded-full bg-gold grid place-items-center text-[#111] text-xl shadow-[0_0_30px_#e8ad3c55]">
-                  ▶
+              {heroVideo ? (
+                <video src={heroVideo} controls autoPlay muted loop playsInline className="w-full h-full object-cover rounded-xl" />
+              ) : (
+                <div className="h-full rounded-xl bg-gradient-to-br from-[#07172b] to-[#0b2440] border border-[#233f5c] grid place-items-center">
+                  <div className="w-14 h-14 rounded-full bg-gold grid place-items-center text-[#111] text-xl shadow-[0_0_30px_#e8ad3c55]">
+                    ▶
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>

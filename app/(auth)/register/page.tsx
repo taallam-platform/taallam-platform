@@ -10,6 +10,10 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [fatherPhone, setFatherPhone] = useState('');
+  const [motherPhone, setMotherPhone] = useState('');
   const [password, setPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -46,7 +50,7 @@ export default function RegisterPage() {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, username, email, password }),
+      body: JSON.stringify({ fullName, username, email, password, phone, whatsapp, fatherPhone, motherPhone }),
     });
     const json = await res.json();
 
@@ -56,6 +60,7 @@ export default function RegisterPage() {
       return;
     }
 
+    // رفع الأفاتار الاختياري بعد إنشاء الحساب (لو السيشن اتفعّلت فورًا)
     if (avatarFile) {
       const formData = new FormData();
       formData.append('avatar', avatarFile);
@@ -63,6 +68,8 @@ export default function RegisterPage() {
     }
 
     setLoading(false);
+
+    // لو ده إيميل الأدمن، بعد ما يأكد الكود هيتحول للوحة التحكم تلقائيًا (منطق ده في صفحة /verify)
     router.push(`/verify?email=${encodeURIComponent(email)}`);
   }
 
@@ -126,6 +133,54 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
             placeholder="example@mail.com"
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايلك (للمكالمات)</span>
+          <input
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-sm font-bold text-[#d3d9e5]">رقم الواتساب</span>
+          <input
+            required
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.value)}
+            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأب</span>
+          <input
+            required
+            value={fatherPhone}
+            onChange={(e) => setFatherPhone(e.target.value)}
+            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأم</span>
+          <input
+            required
+            value={motherPhone}
+            onChange={(e) => setMotherPhone(e.target.value)}
+            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
           />
         </label>
 

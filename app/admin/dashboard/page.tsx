@@ -3,11 +3,12 @@ import CoursesList from './CoursesList';
 import UsersTable from './UsersTable';
 import PendingPayments from './PendingPayments';
 import AdminSupportInbox from './AdminSupportInbox';
+import HeroVideoUploader from './HeroVideoUploader';
 
 export default async function AdminDashboardPage() {
   const supabase = createClient();
 
-  const [{ count: studentsCount }, { count: coursesCount }, { data: users }, { data: courses }, { data: pendingRaw }] = await Promise.all([
+  const [{ count: studentsCount }, { count: coursesCount }, { data: users }, { data: courses }, { data: pendingRaw }, { data: heroSetting }] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
     supabase.from('courses').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('id, full_name, avatar_url, role, is_banned').order('created_at', { ascending: false }).limit(50),
@@ -17,6 +18,7 @@ export default async function AdminDashboardPage() {
       .select('id, student:student_id(full_name), course:course_id(title, price)')
       .eq('status', 'pending')
       .order('enrolled_at', { ascending: false }),
+    supabase.from('site_settings').select('value').eq('key', 'hero_video_url').maybeSingle(),
   ]);
 
   const pendingRequests = (pendingRaw ?? []).map((r: any) => ({
@@ -45,6 +47,8 @@ export default async function AdminDashboardPage() {
           <strong className="block text-3xl mt-1 text-amber-400">{pendingRequests.length}</strong>
         </div>
       </div>
+
+      <HeroVideoUploader currentUrl={heroSetting?.value ?? null} />
 
       <h2 className="text-lg font-bold mb-4">💬 الدعم الفني (رسايل الطلاب)</h2>
       <div className="mb-10">

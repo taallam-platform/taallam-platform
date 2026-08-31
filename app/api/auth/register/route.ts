@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const email = parsed.data.email.trim().toLowerCase();
   const username = parsed.data.username.trim().toLowerCase();
   const fullName = sanitizeInput(parsed.data.fullName);
-  const { password } = parsed.data;
+  const { password, phone, whatsapp, fatherPhone, motherPhone } = parsed.data;
 
   // تأكد إن اسم المستخدم مش مستخدم قبل كده
   const adminCheck = createAdminClient();
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName, username } },
+    options: { data: { full_name: fullName, username, phone, whatsapp, father_phone: fatherPhone, mother_phone: motherPhone } },
   });
 
   if (error || !data.user) {

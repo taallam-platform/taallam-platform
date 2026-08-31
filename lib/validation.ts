@@ -15,11 +15,19 @@ export const usernameSchema = z
   .max(30, 'اسم المستخدم طويل أوي')
   .regex(/^[a-zA-Z0-9_]+$/, 'اسم المستخدم يسمح فيه بس بحروف إنجليزي وأرقام و _');
 
+const egyptPhoneSchema = z
+  .string()
+  .regex(/^01[0125][0-9]{8}$/, 'رقم الموبايل لازم يكون رقم مصري صحيح (11 رقم)');
+
 export const registerSchema = z.object({
   fullName: z.string().min(2).max(80),
   username: usernameSchema,
   email: z.string().email(),
   password: passwordSchema,
+  phone: egyptPhoneSchema,
+  whatsapp: egyptPhoneSchema,
+  fatherPhone: egyptPhoneSchema,
+  motherPhone: egyptPhoneSchema,
 });
 
 export const loginSchema = z.object({
