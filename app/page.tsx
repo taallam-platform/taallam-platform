@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import Navbar from '@/components/Navbar';
 
 const CATEGORIES = [
@@ -24,7 +24,7 @@ async function getFeaturedCourses() {
 }
 
 async function getStats() {
-  const supabase = createClient();
+  const supabase = createAdminClient();
   const [{ count: coursesCount }, { count: studentsCount }, { count: teachersCount }] = await Promise.all([
     supabase.from('courses').select('*', { count: 'exact', head: true }).eq('is_published', true),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
