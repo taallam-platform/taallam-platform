@@ -11,14 +11,14 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  const { data: profile } = await admin
+  const { data: profile, error: dbError } = await admin
     .from('profiles')
-    .select('id')
+    .select('id, username')
     .eq('username', username)
     .maybeSingle();
 
   if (!profile) {
-    return NextResponse.json({ error: 'اسم المستخدم أو كلمة السر غير صحيحة' }, { status: 401 });
+    return NextResponse.json({ error: `not found: username="${username}", dbError=${JSON.stringify(dbError)}` }, { status: 401 });
   }
 
   const { data: userData, error } = await admin.auth.admin.getUserById(profile.id);

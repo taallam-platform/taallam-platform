@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     if (!resolveRes.ok) {
       setLoading(false);
-      setError('اسم المستخدم غير موجود (resolve failed)');
+      setError(resolveJson.error ?? 'اسم المستخدم غير موجود (resolve failed)');
       return;
     }
 
