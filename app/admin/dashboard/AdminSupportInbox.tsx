@@ -19,7 +19,7 @@ export default function AdminSupportInbox() {
       .order('created_at', { ascending: false });
 
     const grouped: Record<string, any> = {};
-    for (const m of data ?? []) {
+    for (const m of (data ?? []) as any[]) {
       if (!grouped[m.student_id]) {
         grouped[m.student_id] = {
           student_id: m.student_id,
