@@ -37,7 +37,7 @@ export default function CoursesList({ courses }: { courses: any[] }) {
             <span className="w-2.5 h-2.5 rounded-full" style={{ background: COVER_DOTS[c.cover_color] ?? '#1677ff' }} />
             <h3 className="font-bold text-sm">{c.title}</h3>
           </div>
-          <p className="text-[#7a7f8a] text-xs mb-3">{c.category} · {c.price} ر.س</p>
+          <p className="text-[#7a7f8a] text-xs mb-3">{c.category} · {c.price} ج.م</p>
           <div className="flex gap-2 flex-wrap">
             <a href={`/admin/dashboard/courses/${c.id}`} className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#8a5a1e] text-gold">
               إدارة المواد

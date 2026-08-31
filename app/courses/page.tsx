@@ -103,7 +103,7 @@ function CoursesBrowsePageInner() {
                       {ratings.length > 0 && <span className="text-gold font-bold">⭐ {avg.toFixed(1)}</span>}
                       <span>👥 {studentsCount} طالب</span>
                     </div>
-                    <span className="text-gold font-black text-sm">{c.price} ر.س</span>
+                    <span className="text-gold font-black text-sm">{c.price} ج.م</span>
                   </div>
                 </a>
               );

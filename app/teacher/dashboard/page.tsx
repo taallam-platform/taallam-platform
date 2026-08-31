@@ -29,7 +29,7 @@ export default async function TeacherDashboardPage() {
           {courses.map((c) => (
             <div key={c.id} className="bg-[#0a0d13] border border-[#1b2029] rounded-2xl p-4">
               <h3 className="font-bold text-sm mb-1">{c.title}</h3>
-              <p className="text-[#7a7f8a] text-xs mb-3">{c.category} · {c.price} ر.س · {c.is_published ? 'منشور' : 'مسودة'}</p>
+              <p className="text-[#7a7f8a] text-xs mb-3">{c.category} · {c.price} ج.م · {c.is_published ? 'منشور' : 'مسودة'}</p>
               <a href={`/admin/dashboard/courses/${c.id}`} className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#8a5a1e] text-gold">
                 إدارة المواد
               </a>

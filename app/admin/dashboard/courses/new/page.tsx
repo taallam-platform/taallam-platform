@@ -109,7 +109,7 @@ export default function NewCoursePage() {
         </div>
 
         <label className="block mb-6">
-          <span className="text-xs font-bold text-[#9aa0ab]">السعر (ر.س)</span>
+          <span className="text-xs font-bold text-[#9aa0ab]">السعر (ج.م)</span>
           <input
             type="number"
             min="0"

@@ -147,7 +147,7 @@ export default async function HomePage() {
                     <h3 className="text-sm leading-7 mb-2 font-bold">{c.title}</h3>
                     <div className="text-[#8493a7] text-[11px]">👤 {c.profiles?.full_name ?? 'مدرّس'}</div>
                     <div className="flex justify-between items-center mt-3.5 text-xs">
-                      <span className="text-gold font-black text-[15px]">{c.price} ر.س</span>
+                      <span className="text-gold font-black text-[15px]">{c.price} ج.م</span>
                     </div>
                   </div>
                 </article>

@@ -16,6 +16,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
   const [materials, setMaterials] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState<any[]>([]);
   const [myRating, setMyRating] = useState(0);
@@ -61,11 +62,12 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
       const { data: enrollment } = await supabase
         .from('enrollments')
-        .select('id')
+        .select('id, status')
         .eq('student_id', user.id)
         .eq('course_id', params.id)
         .maybeSingle();
-      setIsEnrolled(!!enrollment);
+      setIsEnrolled(enrollment?.status === 'approved');
+      setIsPending(enrollment?.status === 'pending');
 
       const { data: myReview } = await supabase
         .from('reviews')
@@ -116,10 +118,18 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             )}
           </div>
 
-          {!isEnrolled && (
+          {isPending && (
+            <div className="border-t border-line pt-4">
+              <div className="bg-amber-950/40 border border-amber-800 text-amber-300 text-sm rounded-lg p-3.5">
+                ⏳ طلبك قيد المراجعة، هتقدر تدخل الكورس بمجرد ما الإدارة توافق.
+              </div>
+            </div>
+          )}
+
+          {!isEnrolled && !isPending && (
             <div className="flex items-center justify-between border-t border-line pt-4">
-              <span className="text-gold font-black text-xl">{course.price} ر.س</span>
-              <EnrollButton courseId={course.id} onEnrolled={loadData} />
+              <span className="text-gold font-black text-xl">{course.price} ج.م</span>
+              <EnrollButton courseId={course.id} price={course.price} onEnrolled={loadData} />
             </div>
           )}
         </div>
