@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Navbar from '@/components/Navbar';
 
@@ -13,12 +14,28 @@ const COVER_GRADIENTS: Record<string, string> = {
 };
 
 export default function CoursesBrowsePage() {
+  return (
+    <Suspense fallback={null}>
+      <CoursesBrowsePageInner />
+    </Suspense>
+  );
+}
+
+function CoursesBrowsePageInner() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
   const [courses, setCourses] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('الكل');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl && CATEGORIES.includes(categoryFromUrl)) {
+      setCategory(categoryFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     (async () => {
@@ -28,7 +45,10 @@ export default function CoursesBrowsePage() {
         setProfile(p);
       }
 
-      let q = supabase.from('courses').select('id, title, price, category, cover_color, profiles:teacher_id(full_name)').eq('is_published', true);
+      let q = supabase
+        .from('courses')
+        .select('id, title, price, category, cover_color, profiles:teacher_id(full_name), reviews(rating), enrollments(id)')
+        .eq('is_published', true);
       const { data } = await q;
       setCourses(data ?? []);
       setLoading(false);
@@ -69,16 +89,25 @@ export default function CoursesBrowsePage() {
           <p className="text-muted text-center card p-10">مفيش كورسات مطابقة للبحث</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filtered.map((c) => (
-              <a key={c.id} href={`/courses/${c.id}`} className="card overflow-hidden hover:-translate-y-1 hover:border-[#8f6826] transition block">
-                <div className={`h-[130px] p-3.5 bg-gradient-to-br ${COVER_GRADIENTS[c.cover_color] ?? COVER_GRADIENTS.blue}`} />
-                <div className="p-4">
-                  <h3 className="text-sm leading-6 mb-2 font-bold">{c.title}</h3>
-                  <div className="text-[#8493a7] text-[11px] mb-2">👤 {c.profiles?.full_name ?? 'مدرّس'}</div>
-                  <span className="text-gold font-black text-sm">{c.price} ر.س</span>
-                </div>
-              </a>
-            ))}
+            {filtered.map((c: any) => {
+              const ratings = c.reviews?.map((r: any) => r.rating) ?? [];
+              const avg = ratings.length ? ratings.reduce((s: number, r: number) => s + r, 0) / ratings.length : 0;
+              const studentsCount = c.enrollments?.length ?? 0;
+              return (
+                <a key={c.id} href={`/courses/${c.id}`} className="card overflow-hidden hover:-translate-y-1 hover:border-[#8f6826] transition block">
+                  <div className={`h-[130px] p-3.5 bg-gradient-to-br ${COVER_GRADIENTS[c.cover_color] ?? COVER_GRADIENTS.blue}`} />
+                  <div className="p-4">
+                    <h3 className="text-sm leading-6 mb-2 font-bold">{c.title}</h3>
+                    <div className="text-[#8493a7] text-[11px] mb-2">👤 {c.profiles?.full_name ?? 'مدرّس'}</div>
+                    <div className="flex items-center gap-2 text-[11px] text-muted mb-2">
+                      {ratings.length > 0 && <span className="text-gold font-bold">⭐ {avg.toFixed(1)}</span>}
+                      <span>👥 {studentsCount} طالب</span>
+                    </div>
+                    <span className="text-gold font-black text-sm">{c.price} ر.س</span>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         )}
       </main>
