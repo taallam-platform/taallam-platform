@@ -11,12 +11,16 @@ const COLORS = [
   { value: 'orange', label: 'برتقالي' },
 ];
 
+const LEVELS = ['مبتدئ', 'متوسط', 'متقدم'];
+
 export default function NewCoursePage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [price, setPrice] = useState('0');
+  const [level, setLevel] = useState(LEVELS[0]);
+  const [durationHours, setDurationHours] = useState('');
   const [color, setColor] = useState('blue');
   const [publish, setPublish] = useState(false);
   const [error, setError] = useState('');
@@ -35,6 +39,8 @@ export default function NewCoursePage() {
         description,
         category,
         price: Number(price),
+        level,
+        duration_hours: durationHours ? Number(durationHours) : null,
         cover_color: color,
         is_published: publish,
       }),
@@ -47,7 +53,6 @@ export default function NewCoursePage() {
       return;
     }
 
-    // بعد إنشاء الكورس، روح لصفحة إضافة المواد جواه على طول
     router.push(`/admin/dashboard/courses/${json.course.id}`);
   }
 
@@ -109,7 +114,7 @@ export default function NewCoursePage() {
         </div>
 
         <label className="block mb-6">
-          <span className="text-xs font-bold text-[#9aa0ab]">السعر (ج.م)</span>
+          <span className="text-xs font-bold text-[#9aa0ab]">السعر (ج.م) — اكتب 0 للكورس المجاني</span>
           <input
             type="number"
             min="0"
@@ -118,6 +123,32 @@ export default function NewCoursePage() {
             className="mt-1.5 w-full bg-[#050608] border border-[#22262e] rounded-lg px-3.5 py-2.5"
           />
         </label>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <label className="block">
+            <span className="text-xs font-bold text-[#9aa0ab]">المستوى</span>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="mt-1.5 w-full bg-[#050608] border border-[#22262e] rounded-lg px-3.5 py-2.5"
+            >
+              {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-bold text-[#9aa0ab]">مدة الكورس (بالساعات)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={durationHours}
+              onChange={(e) => setDurationHours(e.target.value)}
+              placeholder="مثال: 6"
+              className="mt-1.5 w-full bg-[#050608] border border-[#22262e] rounded-lg px-3.5 py-2.5"
+            />
+          </label>
+        </div>
 
         <label className="flex items-center gap-2 mb-6 text-sm">
           <input type="checkbox" checked={publish} onChange={(e) => setPublish(e.target.checked)} />

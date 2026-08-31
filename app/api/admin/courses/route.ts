@@ -8,6 +8,8 @@ const courseSchema = z.object({
   description: z.string().max(2000).optional(),
   category: z.string().min(2).max(60),
   price: z.number().min(0),
+  level: z.enum(['مبتدئ', 'متوسط', 'متقدم']).optional(),
+  duration_hours: z.number().min(0).nullable().optional(),
   cover_color: z.enum(['blue', 'purple', 'green', 'orange']),
   is_published: z.boolean().default(false),
 });

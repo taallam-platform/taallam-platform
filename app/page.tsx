@@ -17,7 +17,7 @@ async function getFeaturedCourses() {
   const supabase = createClient();
   const { data } = await supabase
     .from('courses')
-    .select('id, title, price, cover_color, category, teacher_id, profiles:teacher_id(full_name)')
+    .select('id, title, price, cover_color, category, level, duration_hours, teacher_id, profiles:teacher_id(full_name)')
     .eq('is_published', true)
     .limit(8);
   return data ?? [];
@@ -141,13 +141,20 @@ export default async function HomePage() {
               {courses.map((c: any) => (
                 <article key={c.id} className="card overflow-hidden hover:-translate-y-1 hover:border-[#8f6826] transition">
                   <div className={`h-[150px] p-3.5 bg-gradient-to-br relative overflow-hidden ${COVER_GRADIENTS[c.cover_color] ?? COVER_GRADIENTS.blue}`}>
+                    <div className="absolute top-3.5 left-3.5 w-7 h-7 rounded-full bg-black/40 grid place-items-center text-xs">
+                      {c.price > 0 ? '🔒' : '🔓'}
+                    </div>
                     <div className="absolute bottom-3.5 right-3.5 text-xl font-black">{c.category}</div>
                   </div>
                   <div className="p-4">
                     <h3 className="text-sm leading-7 mb-2 font-bold">{c.title}</h3>
-                    <div className="text-[#8493a7] text-[11px]">👤 {c.profiles?.full_name ?? 'مدرّس'}</div>
-                    <div className="flex justify-between items-center mt-3.5 text-xs">
-                      <span className="text-gold font-black text-[15px]">{c.price} ج.م</span>
+                    <div className="text-[#8493a7] text-[11px] mb-2">👤 {c.profiles?.full_name ?? 'مدرّس'}</div>
+                    <div className="flex items-center gap-2 text-[10px] text-muted mb-3 flex-wrap">
+                      {c.level && <span className="bg-[#0f1a29] rounded-full px-2 py-0.5">{c.level}</span>}
+                      {c.duration_hours && <span className="bg-[#0f1a29] rounded-full px-2 py-0.5">⏱ {c.duration_hours} ساعة</span>}
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gold font-black text-[15px]">{c.price > 0 ? `${c.price} ج.م` : 'مجاني'}</span>
                     </div>
                   </div>
                 </article>
