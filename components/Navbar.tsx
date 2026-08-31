@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 type Profile = {
   full_name: string;
@@ -36,6 +38,15 @@ export function AvatarBadge({ profile, size = 40 }: { profile: Profile; size?: n
 }
 
 export default function Navbar({ profile }: { profile: Profile }) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  }
+
   const links = [
     { href: '/courses', label: 'الكورسات' },
     { href: '/#teachers', label: 'المدرسون' },
@@ -79,6 +90,12 @@ export default function Navbar({ profile }: { profile: Profile }) {
               <Link href="/profile" className="flex items-center gap-2">
                 <AvatarBadge profile={profile} size={42} />
               </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-red-800 hover:bg-red-700 text-white text-sm font-bold rounded-lg px-4 py-2.5 transition"
+              >
+                تسجيل خروج
+              </button>
             </>
           ) : (
             <>
