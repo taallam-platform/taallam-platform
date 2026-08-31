@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import CoursesList from './CoursesList';
 import UsersTable from './UsersTable';
 import PendingPayments from './PendingPayments';
+import AdminSupportInbox from './AdminSupportInbox';
 
 export default async function AdminDashboardPage() {
   const supabase = createClient();
@@ -43,6 +44,11 @@ export default async function AdminDashboardPage() {
           <span className="text-[#7a7f8a] text-xs">طلبات دفع قيد المراجعة</span>
           <strong className="block text-3xl mt-1 text-amber-400">{pendingRequests.length}</strong>
         </div>
+      </div>
+
+      <h2 className="text-lg font-bold mb-4">💬 الدعم الفني (رسايل الطلاب)</h2>
+      <div className="mb-10">
+        <AdminSupportInbox />
       </div>
 
       <h2 className="text-lg font-bold mb-4">💳 طلبات الدفع قيد المراجعة</h2>
