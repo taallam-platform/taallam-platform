@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     if (!resolveRes.ok) {
       setLoading(false);
-      setError(resolveJson.error ?? 'اسم المستخدم أو كلمة السر غير صحيحة');
+      setError('اسم المستخدم غير موجود (resolve failed)');
       return;
     }
 
@@ -37,7 +37,7 @@ export default function LoginPage() {
 
     if (signInError || !data.user) {
       setLoading(false);
-      setError('اسم المستخدم أو كلمة السر غير صحيحة');
+      setError(`خطأ الدخول: ${signInError?.message ?? 'unknown'}`);
       return;
     }
 
