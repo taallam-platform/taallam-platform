@@ -52,7 +52,18 @@ export default function RegisterPage() {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, chosenRole, username, email, password, phone, whatsapp, fatherPhone, motherPhone, telegramUsername }),
+      body: JSON.stringify({
+        fullName,
+        chosenRole,
+        username,
+        email,
+        password,
+        phone,
+        whatsapp,
+        fatherPhone: chosenRole === 'student' ? fatherPhone : '',
+        motherPhone: chosenRole === 'student' ? motherPhone : '',
+        telegramUsername,
+      }),
     });
     const json = await res.json();
 
@@ -180,29 +191,33 @@ export default function RegisterPage() {
           />
         </label>
 
-        <label className="block mb-4">
-          <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأب</span>
-          <input
-            required
-            value={fatherPhone}
-            onChange={(e) => setFatherPhone(e.target.value)}
-            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
-            placeholder="01xxxxxxxxx"
-            dir="ltr"
-          />
-        </label>
+        {chosenRole === 'student' && (
+          <>
+            <label className="block mb-4">
+              <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأب</span>
+              <input
+                required
+                value={fatherPhone}
+                onChange={(e) => setFatherPhone(e.target.value)}
+                className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+                placeholder="01xxxxxxxxx"
+                dir="ltr"
+              />
+            </label>
 
-        <label className="block mb-4">
-          <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأم</span>
-          <input
-            required
-            value={motherPhone}
-            onChange={(e) => setMotherPhone(e.target.value)}
-            className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
-            placeholder="01xxxxxxxxx"
-            dir="ltr"
-          />
-        </label>
+            <label className="block mb-4">
+              <span className="text-sm font-bold text-[#d3d9e5]">رقم موبايل الأم</span>
+              <input
+                required
+                value={motherPhone}
+                onChange={(e) => setMotherPhone(e.target.value)}
+                className="mt-1.5 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2.5 outline-none focus:border-gold"
+                placeholder="01xxxxxxxxx"
+                dir="ltr"
+              />
+            </label>
+          </>
+        )}
 
         <label className="block mb-4">
           <span className="text-sm font-bold text-[#d3d9e5]">يوزر تيليجرام بتاعك</span>

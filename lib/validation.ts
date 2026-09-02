@@ -27,8 +27,8 @@ export const registerSchema = z.object({
   password: passwordSchema,
   phone: egyptPhoneSchema,
   whatsapp: egyptPhoneSchema,
-  fatherPhone: egyptPhoneSchema,
-  motherPhone: egyptPhoneSchema,
+  fatherPhone: egyptPhoneSchema.or(z.literal('')),
+  motherPhone: egyptPhoneSchema.or(z.literal('')),
   telegramUsername: z.string().min(3).max(40),
 });
 
