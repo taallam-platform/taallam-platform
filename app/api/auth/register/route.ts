@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const email = parsed.data.email.trim().toLowerCase();
   const username = parsed.data.username.trim().toLowerCase();
   const fullName = sanitizeInput(parsed.data.fullName);
-  const { password, phone, whatsapp, fatherPhone, motherPhone } = parsed.data;
+  const { password, phone, whatsapp, fatherPhone, motherPhone, telegramUsername, chosenRole } = parsed.data;
 
   // تأكد إن اسم المستخدم مش مستخدم قبل كده
   const adminCheck = createAdminClient();
@@ -31,11 +31,24 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName, username, phone, whatsapp, father_phone: fatherPhone, mother_phone: motherPhone } },
+    options: { data: { full_name: fullName, username, phone, whatsapp, father_phone: fatherPhone, mother_phone: motherPhone, telegram_username: telegramUsername, chosen_role: chosenRole } },
   });
 
   if (error || !data.user) {
     return NextResponse.json({ error: error?.message ?? 'فشل إنشاء الحساب' }, { status: 400 });
+  }
+
+  // إشعار تيليجرام للأدمن بتسجيل جديد
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+  if (botToken && chatId) {
+    const roleLabel = chosenRole === 'teacher' ? 'مدرّس' : 'طالب';
+    const text = `📥 تسجيل جديد في تعلّم\nالاسم: ${fullName}\nالنوع: ${roleLabel}\nيوزر: ${username}\nتيليجرام: @${telegramUsername}\nموبايل: ${phone}`;
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    }).catch(() => {});
   }
 
   // لو الإيميل ده هو إيميل الأدمن المحدد في متغيرات البيئة، رفّع الرول تلقائيًا

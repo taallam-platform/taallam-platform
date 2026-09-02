@@ -118,6 +118,17 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             )}
           </div>
 
+          {isEnrolled && course.teacher_whatsapp && (
+            <a
+              href={`https://wa.me/2${course.teacher_whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#1fae54] hover:bg-[#189646] text-white font-bold text-sm rounded-lg px-4 py-2.5 mb-4 transition"
+            >
+              💬 تواصل مع المدرّس
+            </a>
+          )}
+
           {isPending && (
             <div className="border-t border-line pt-4">
               <div className="bg-amber-950/40 border border-amber-800 text-amber-300 text-sm rounded-lg p-3.5">

@@ -21,6 +21,7 @@ export default function NewCoursePage() {
   const [price, setPrice] = useState('0');
   const [level, setLevel] = useState(LEVELS[0]);
   const [durationHours, setDurationHours] = useState('');
+  const [teacherWhatsapp, setTeacherWhatsapp] = useState('');
   const [color, setColor] = useState('blue');
   const [publish, setPublish] = useState(false);
   const [error, setError] = useState('');
@@ -41,6 +42,7 @@ export default function NewCoursePage() {
         price: Number(price),
         level,
         duration_hours: durationHours ? Number(durationHours) : null,
+        teacher_whatsapp: teacherWhatsapp || null,
         cover_color: color,
         is_published: publish,
       }),
@@ -149,6 +151,17 @@ export default function NewCoursePage() {
             />
           </label>
         </div>
+
+        <label className="block mb-6">
+          <span className="text-xs font-bold text-[#9aa0ab]">رقم واتساب للتواصل مع طلاب الكورس ده</span>
+          <input
+            value={teacherWhatsapp}
+            onChange={(e) => setTeacherWhatsapp(e.target.value)}
+            placeholder="01xxxxxxxxx"
+            dir="ltr"
+            className="mt-1.5 w-full bg-[#050608] border border-[#22262e] rounded-lg px-3.5 py-2.5"
+          />
+        </label>
 
         <label className="flex items-center gap-2 mb-6 text-sm">
           <input type="checkbox" checked={publish} onChange={(e) => setPublish(e.target.checked)} />

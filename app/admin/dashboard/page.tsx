@@ -11,7 +11,7 @@ export default async function AdminDashboardPage() {
   const [{ count: studentsCount }, { count: coursesCount }, { data: users }, { data: courses }, { data: pendingRaw }, { data: heroSetting }] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
     supabase.from('courses').select('*', { count: 'exact', head: true }),
-    supabase.from('profiles').select('id, full_name, avatar_url, role, is_banned').order('created_at', { ascending: false }).limit(50),
+    supabase.from('profiles').select('id, full_name, avatar_url, role, is_banned, phone, father_phone, mother_phone, telegram_username').order('created_at', { ascending: false }).limit(50),
     supabase.from('courses').select('*').order('created_at', { ascending: false }),
     supabase
       .from('enrollments')

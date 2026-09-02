@@ -21,6 +21,7 @@ const egyptPhoneSchema = z
 
 export const registerSchema = z.object({
   fullName: z.string().min(2).max(80),
+  chosenRole: z.enum(['student', 'teacher']),
   username: usernameSchema,
   email: z.string().email(),
   password: passwordSchema,
@@ -28,6 +29,7 @@ export const registerSchema = z.object({
   whatsapp: egyptPhoneSchema,
   fatherPhone: egyptPhoneSchema,
   motherPhone: egyptPhoneSchema,
+  telegramUsername: z.string().min(3).max(40),
 });
 
 export const loginSchema = z.object({

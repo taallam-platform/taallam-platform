@@ -10,6 +10,7 @@ const courseSchema = z.object({
   price: z.number().min(0),
   level: z.enum(['مبتدئ', 'متوسط', 'متقدم']).optional(),
   duration_hours: z.number().min(0).nullable().optional(),
+  teacher_whatsapp: z.string().nullable().optional(),
   cover_color: z.enum(['blue', 'purple', 'green', 'orange']),
   is_published: z.boolean().default(false),
 });

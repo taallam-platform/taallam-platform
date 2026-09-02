@@ -7,8 +7,11 @@ import { AvatarBadge } from '@/components/Navbar';
 
 export default function ProfilePage() {
   const supabase = createClient();
-  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string | null } | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [fullName, setFullName] = useState('');
+  const [instapay, setInstapay] = useState('');
+  const [vodafoneCash, setVodafoneCash] = useState('');
+  const [bankAccount, setBankAccount] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -16,10 +19,17 @@ export default function ProfilePage() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).single();
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, role, teacher_instapay, teacher_vodafone_cash, teacher_bank_account')
+        .eq('id', user.id)
+        .single();
       if (data) {
         setProfile(data);
         setFullName(data.full_name);
+        setInstapay(data.teacher_instapay ?? '');
+        setVodafoneCash(data.teacher_vodafone_cash ?? '');
+        setBankAccount(data.teacher_bank_account ?? '');
       }
     })();
   }, []);
@@ -58,6 +68,24 @@ export default function ProfilePage() {
     setSaving(false);
   }
 
+  async function handleSavePayment(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({
+          teacher_instapay: instapay || null,
+          teacher_vodafone_cash: vodafoneCash || null,
+          teacher_bank_account: bankAccount || null,
+        })
+        .eq('id', user.id);
+      setMessage('تم حفظ أرقام الدفع ✓');
+    }
+    setSaving(false);
+  }
+
   if (!profile) return <div className="min-h-screen bg-navy grid place-items-center text-muted">جاري التحميل...</div>;
 
   return (
@@ -88,6 +116,47 @@ export default function ProfilePage() {
             {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
           </button>
         </form>
+
+        {profile.role === 'teacher' && (
+          <form onSubmit={handleSavePayment} className="mt-8 pt-6 border-t border-line">
+            <h2 className="text-sm font-black mb-1">أرقام الدفع (تظهر للطلاب)</h2>
+            <p className="text-xs text-muted mb-4">اختياري — حط أي رقم أو أكتر عندك</p>
+
+            <label className="block mb-3">
+              <span className="text-xs font-bold text-[#d3d9e5]">انستاباي</span>
+              <input
+                value={instapay}
+                onChange={(e) => setInstapay(e.target.value)}
+                className="mt-1 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2 text-sm outline-none focus:border-gold"
+                dir="ltr"
+              />
+            </label>
+
+            <label className="block mb-3">
+              <span className="text-xs font-bold text-[#d3d9e5]">فودافون كاش</span>
+              <input
+                value={vodafoneCash}
+                onChange={(e) => setVodafoneCash(e.target.value)}
+                className="mt-1 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2 text-sm outline-none focus:border-gold"
+                dir="ltr"
+              />
+            </label>
+
+            <label className="block mb-4">
+              <span className="text-xs font-bold text-[#d3d9e5]">حساب بنكي (اختياري)</span>
+              <input
+                value={bankAccount}
+                onChange={(e) => setBankAccount(e.target.value)}
+                className="mt-1 w-full bg-[#071221] border border-line rounded-lg px-3.5 py-2 text-sm outline-none focus:border-gold"
+                dir="ltr"
+              />
+            </label>
+
+            <button disabled={saving} className="btn-outline w-full justify-center text-sm">
+              {saving ? 'جاري الحفظ...' : 'حفظ أرقام الدفع'}
+            </button>
+          </form>
+        )}
       </div>
     </main>
   );

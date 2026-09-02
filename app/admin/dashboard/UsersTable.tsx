@@ -98,7 +98,17 @@ export default function UsersTable({ users }: { users: any[] }) {
               <>
                 <td className="p-4 flex items-center gap-3">
                   <AvatarBadge profile={u} size={34} />
-                  {u.full_name}
+                  <div>
+                    {u.full_name}
+                    {(u.phone || u.father_phone || u.mother_phone) && (
+                      <div className="text-[10px] text-[#7a7f8a] mt-1 space-y-0.5">
+                        {u.phone && <div>📱 الطالب: {u.phone}</div>}
+                        {u.father_phone && <div>👨 الأب: {u.father_phone}</div>}
+                        {u.mother_phone && <div>👩 الأم: {u.mother_phone}</div>}
+                        {u.telegram_username && <div>✈️ @{u.telegram_username}</div>}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="p-4">{u.role}</td>
                 <td className="p-4">
