@@ -46,7 +46,7 @@ export default function ProfilePage() {
       const res = await fetch('/api/upload/avatar', { method: 'POST', body: formData });
       const json = await res.json();
       if (res.ok) {
-        setProfile((p) => (p ? { ...p, avatar_url: json.avatar_url } : p));
+        setProfile((p: any) => (p ? { ...p, avatar_url: json.avatar_url } : p));
         setMessage('تم تحديث الصورة ✓');
       } else {
         setMessage(json.error);
